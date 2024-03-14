@@ -78,6 +78,28 @@ def try_deleteRoom(conn, room_number):
         return "error"
     return "success"
 
+def try_deleteStudent(conn, idNum):
+    try:
+        cur = conn.cursor()
+        sql = "DELETE FROM student WHERE id = %s"
+        params = (str(idNum),)
+        cur.execute(sql, params)
+        conn.commit()
+    except:
+        return "error"
+    return "success"
+
+def try_deleteEnrollment(conn, idNum, course):
+    try:
+        cur = conn.cursor()
+        sql = "DELETE FROM enrolled WHERE student = %s AND course = %s"
+        params = (str(idNum), course)
+        cur.execute(sql, params)
+        conn.commit()
+    except:
+        return "error"
+    return "success"
+
 def show_add_room(conn):
     return """
     <a href="./university.py">Return to main page.</a>
@@ -311,6 +333,7 @@ def showProfilePage(conn):
             '<input type="submit" name="updateEnrollment" value="Update">'
             "<td><form method='post' action='miniFacebook.py'>"
             f"<input type='hidden' NAME='idNum' VALUE='{item[0]}'>"
+            f"<input type='hidden' NAME='courseNum' VALUE='{item[1]}'>"
             '<input type="submit" name="deleteEnrollment" value="Delete">'
             "</form></td>"
             "</tr>\n"
@@ -405,6 +428,12 @@ def deleteRoom(conn, idNum):
     # else:
     #     return "Delete Profile Failed."
 
+# def deleteStudent(conn, idNum):
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT * FROM student WHERE id = %s", (idNum,))
+#     data = cursor.fetchall()
+#     string = ""
+#     return str(data[0][0])
 
 def get_qs_post(env):
     """
@@ -464,6 +493,16 @@ def application(env, start_response):
             body += try_deleteRoom(conn, post['idNum'][0])
             body += str(post)
             body += str(post['idNum'][0])
+            body += showProfilePage(conn)
+    elif "deleteStudent" in post:
+            body += try_deleteStudent(conn, post['idNum'][0])
+            # body += str(post)
+            # body += str(post['idNum'][0])
+            body += showProfilePage(conn)
+    elif "deleteEnrollment" in post:
+            body += try_deleteEnrollment(conn, post['idNum'][0], post['courseNum'][0])
+            # body += str(post)
+            # body += str(post['idNum'][0])
             body += showProfilePage(conn)
     elif "addRooms" in post:
         body += show_add_room(conn)
