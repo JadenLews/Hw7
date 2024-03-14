@@ -70,7 +70,9 @@ def tryaddRoom(conn, room_number, capacity):
 def try_deleteRoom(conn, room_number):
     try:
         cur = conn.cursor()
-        cur.execute("DELETE FROM room WHERE number = %s", (room_number))
+        sql = "DELETE FROM room WHERE number = %s"
+        params = (str(room_number),)
+        cur.execute(sql, params)
         conn.commit()
     except:
         return "error"
@@ -137,7 +139,7 @@ def showProfilePage(conn):
             f"<td>{item[0]}</td>"
             f"<td>{str(item[1])}</td>"
             "<td><form method='post' action='miniFacebook.py'>"
-            f"<input type='hidden' NAME='idNum' VALUE='{item[0]}'>"
+            f"<input type='hidden' NAME='update' VALUE='{item[0]}'>"
             '<input type="submit" name="updateRoom" value="Update">'
             "<td><form method='post' action='miniFacebook.py'>"
             f"<input type='hidden' NAME='idNum' VALUE='{item[0]}'>"
@@ -331,6 +333,61 @@ def showProfilePage(conn):
     """
     return body
 
+def getupdateRoomform(conn, idNum):
+    # First, get current data for this profile
+    cursor = conn.cursor()
+
+    sql = """
+    SELECT *
+    FROM room
+    WHERE number=%s
+    """
+    cursor.execute(sql, (idNum,))
+
+    data = cursor.fetchall()
+
+    # Create a form to update this profile
+    (idNum, lastname, firstName, email, activities) = data[0]
+
+    return """
+    <h2>Update Your Profile Page</h2>
+    <p>
+    <FORM METHOD="POST">
+    <table>
+        <tr>
+            <td>Last Name</td>
+            <td><INPUT TYPE="TEXT" NAME="lastname" VALUE="%s"></td>
+        </tr>
+        <tr>
+            <td>First Name</td>
+            <td><INPUT TYPE="TEXT" NAME="firstname" VALUE="%s"></td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td><INPUT TYPE="TEXT" NAME="email" VALUE="%s"></td>
+        </tr>
+        <tr>
+            <td>Activities</td>
+            <td><TEXTAREA COLS=60 NAME="activities">%s</TEXTAREA></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+            <input type="hidden" name="idNum" value="%s">
+            <input type="submit" name="completeUpdate" value="Update!">
+            </td>
+        </tr>
+    </table>
+    </FORM>
+    """ % (
+        lastname,
+        firstName,
+        email,
+        activities,
+        idNum,
+    )
+
+
 
 def deleteRoom(conn, idNum):
     cursor = conn.cursor()
@@ -406,7 +463,7 @@ def application(env, start_response):
     elif "deleteRoom" in post:
             body += try_deleteRoom(conn, post['idNum'][0])
             body += str(post)
-            body += str(post['idNum'])
+            body += str(post['idNum'][0])
             body += showProfilePage(conn)
     elif "addRooms" in post:
         body += show_add_room(conn)
