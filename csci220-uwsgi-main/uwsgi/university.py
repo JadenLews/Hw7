@@ -33,29 +33,29 @@ def showRoom():
 
     return body
 
-def testRoom():
-    return """
-    <h2>Add A Room</h2>
-    <p>
-    <FORM METHOD="POST">
-    <table>
-        <tr>
-            <td>Room Number</td>
-            <td><INPUT TYPE="TEXT" NAME="number" VALUE=""></td>
-        </tr>
-        <tr>
-            <td>Capacity</td>
-            <td><INPUT TYPE="TEXT" NAME="capacity" VALUE=""></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-            <input type="submit" name="addRoom" value="Add!">
-            </td>
-        </tr>
-    </table>
-    </FORM>
-    """
+# def testRoom():
+#     return """
+#     <h2>Add A Room</h2>
+#     <p>
+#     <FORM METHOD="POST">
+#     <table>
+#         <tr>
+#             <td>Room Number</td>
+#             <td><INPUT TYPE="TEXT" NAME="number" VALUE=""></td>
+#         </tr>
+#         <tr>
+#             <td>Capacity</td>
+#             <td><INPUT TYPE="TEXT" NAME="capacity" VALUE=""></td>
+#         </tr>
+#         <tr>
+#             <td></td>
+#             <td>
+#             <input type="submit" name="addRoom" value="Add!">
+#             </td>
+#         </tr>
+#     </table>
+#     </FORM>
+#     """
 def tryaddRoom(conn, room_number, capacity):
     try:
         cur = conn.cursor()
@@ -67,12 +67,44 @@ def tryaddRoom(conn, room_number, capacity):
         return "error"
     return "success"
 
+def tryaddStudent(conn, id, name):
+    try:
+        cur = conn.cursor()
+        sql = "INSERT INTO student VALUES (%s,%s)"
+        params = (id, name)
+        cur.execute(sql, params)
+        conn.commit()
+    except:
+        return "error"
+    return "success"
+
+def tryaddCourse(conn, number, title, room):
+    try:
+        cur = conn.cursor()
+        sql = "INSERT INTO course VALUES (%s,%s,%s)"
+        params = (number, title, room)
+        cur.execute(sql, params)
+        conn.commit()
+    except:
+        return "error"
+    return "success"
+
+def tryaddEnrollment(conn, student, course):
+    try:
+        cur = conn.cursor()
+        sql = "INSERT INTO enrolled VALUES (%s,%s)"
+        params = (student, course)
+        cur.execute(sql, params)
+        conn.commit()
+    except:
+        return "error"
+    return "success"
+
+
 def try_deleteRoom(conn, room_number):
     try:
         cur = conn.cursor()
-        sql = "DELETE FROM room WHERE number = %s"
-        params = (str(room_number),)
-        cur.execute(sql, params)
+        cur.execute("DELETE FROM room WHERE number = %s", (room_number))
         conn.commit()
     except:
         return "error"
@@ -103,6 +135,84 @@ def show_add_room(conn):
     </FORM>
     """
 
+def show_add_student(conn):
+    return """
+    <a href="./university.py">Return to main page.</a>
+    <h2>Add A Student</h2>
+    <p>
+    <FORM METHOD="POST">
+    <table>
+        <tr>
+            <td>Id</td>
+            <td><INPUT TYPE="TEXT" NAME="Id" VALUE=""></td>
+        </tr>
+        <tr>
+            <td>Name</td>
+            <td><INPUT TYPE="TEXT" NAME="Name" VALUE=""></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+            <input type="submit" name="submitStudent" value="Add Student!">
+            </td>
+        </tr>
+    </table>
+    </FORM>
+    """
+
+def show_add_course(conn):
+    return """
+    <a href="./university.py">Return to main page.</a>
+    <h2>Add A Course</h2>
+    <p>
+    <FORM METHOD="POST">
+    <table>
+        <tr>
+            <td>Number</td>
+            <td><INPUT TYPE="TEXT" NAME="number" VALUE=""></td>
+        </tr>
+        <tr>
+            <td>Title</td>
+            <td><INPUT TYPE="TEXT" NAME="title" VALUE=""></td>
+        </tr>
+        <tr>
+            <td>Room</td>
+            <td><INPUT TYPE="TEXT" NAME="room" VALUE=""></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+            <input type="submit" name="submitCourse value="Add Student!">
+            </td>
+        </tr>
+    </table>
+    </FORM>
+    """
+
+def show_add_enrollment(conn):
+    return """
+    <a href="./university.py">Return to main page.</a>
+    <h2>Add Enrollment</h2>
+    <p>
+    <FORM METHOD="POST">
+    <table>
+        <tr>
+            <td>Student</td>
+            <td><INPUT TYPE="TEXT" NAME="student" VALUE=""></td>
+        </tr>
+        <tr>
+            <td>Course</td>
+            <td><INPUT TYPE="TEXT" NAME="course" VALUE=""></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+            <input type="submit" name="submitEnrollment" value="Add Enrollment!">
+            </td>
+        </tr>
+    </table>
+    </FORM>
+    """
 
 
 def showProfilePage(conn):
@@ -139,7 +249,7 @@ def showProfilePage(conn):
             f"<td>{item[0]}</td>"
             f"<td>{str(item[1])}</td>"
             "<td><form method='post' action='miniFacebook.py'>"
-            f"<input type='hidden' NAME='update' VALUE='{item[0]}'>"
+            f"<input type='hidden' NAME='idNum' VALUE='{item[0]}'>"
             '<input type="submit" name="updateRoom" value="Update">'
             "<td><form method='post' action='miniFacebook.py'>"
             f"<input type='hidden' NAME='idNum' VALUE='{item[0]}'>"
@@ -331,62 +441,8 @@ def showProfilePage(conn):
     </table>
     </FORM>
     """
+    
     return body
-
-def getupdateRoomform(conn, idNum):
-    # First, get current data for this profile
-    cursor = conn.cursor()
-
-    sql = """
-    SELECT *
-    FROM room
-    WHERE number=%s
-    """
-    cursor.execute(sql, (idNum,))
-
-    data = cursor.fetchall()
-
-    # Create a form to update this profile
-    (idNum, lastname, firstName, email, activities) = data[0]
-
-    return """
-    <h2>Update Your Profile Page</h2>
-    <p>
-    <FORM METHOD="POST">
-    <table>
-        <tr>
-            <td>Last Name</td>
-            <td><INPUT TYPE="TEXT" NAME="lastname" VALUE="%s"></td>
-        </tr>
-        <tr>
-            <td>First Name</td>
-            <td><INPUT TYPE="TEXT" NAME="firstname" VALUE="%s"></td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            <td><INPUT TYPE="TEXT" NAME="email" VALUE="%s"></td>
-        </tr>
-        <tr>
-            <td>Activities</td>
-            <td><TEXTAREA COLS=60 NAME="activities">%s</TEXTAREA></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-            <input type="hidden" name="idNum" value="%s">
-            <input type="submit" name="completeUpdate" value="Update!">
-            </td>
-        </tr>
-    </table>
-    </FORM>
-    """ % (
-        lastname,
-        firstName,
-        email,
-        activities,
-        idNum,
-    )
-
 
 
 def deleteRoom(conn, idNum):
@@ -448,22 +504,22 @@ def application(env, start_response):
     idNum = None
     if "idNum" in post:
         idNum = post["idNum"][0]
-    if 'addRoom' in post:
-        body += deleteRoom(conn, idNum)
-        body += str(post)
-    if 'addStudent' in post:
-        body += deleteRoom(conn, idNum)
-        body += str(post)
-    if 'addCourse' in post:
-        body += deleteRoom(conn, idNum)
-        body += str(post)
-    if 'addEnrollment' in post:
-        body += deleteRoom(conn, idNum)
-        body += str(post)
-    elif "deleteRoom" in post:
+    # if 'addRoom' in post:
+    #     body += deleteRoom(conn, idNum)
+    # #     body += str(post)
+    # if 'addStudent' in post:
+    #     body += deleteRoom(conn, idNum)
+    #     body += str(post)
+    # if 'addCourse' in post:
+    #     body += deleteRoom(conn, idNum)
+    # #     body += str(post)
+    # if 'addEnrollment' in post:
+    #     body += deleteRoom(conn, idNum)
+    #     body += str(post)
+    if "deleteRoom" in post:
             body += try_deleteRoom(conn, post['idNum'][0])
             body += str(post)
-            body += str(post['idNum'][0])
+            body += str(post['idNum'])
             body += showProfilePage(conn)
     elif "addRooms" in post:
         body += show_add_room(conn)
@@ -472,6 +528,26 @@ def application(env, start_response):
     elif "submitRoom" in post:
         body += tryaddRoom(conn, post["room_number"][0], post["capacity"][0])
         body += showProfilePage(conn)
+    elif "addStudent" in post:
+        body += show_add_student(conn)
+        body += str(post)
+    elif "submitStudent" in post:
+        body += tryaddStudent(conn, post["Id"][0], post["Name"][0])
+        body += showProfilePage(conn)
+    elif "addCourse" in post:
+        body += show_add_course(conn)
+        body += str(post)
+    elif "submitCourse" in post:
+        body += tryaddCourse(conn, post["number"][0], post["title"][0], post["room"][0])
+        body += showProfilePage(conn)
+    elif "addEnrollment" in post:
+        body += show_add_enrollment(conn)
+        body += str(post)
+        body += 'abc'
+    elif "submitEnrollment" in post:
+        body += tryaddEnrollment(conn, post["student"][0], post["course"][0])
+        body += showProfilePage(conn)
+        
     else:
         body = showProfilePage(conn)
     
