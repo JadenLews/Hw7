@@ -81,12 +81,31 @@ def try_deleteRoom(conn, room_number):
 def try_deleteStudent(conn, idNum):
     try:
         cur = conn.cursor()
+        sql = "DELETE FROM enrolled WHERE student = %s"
+        params = (str(idNum),)
+        cur.execute(sql, params)
+        conn.commit()
+    except:
+        return "error"
+    
+    try:
+        cur = conn.cursor()
+        sql = "DELETE FROM majors_in WHERE student = %s"
+        params = (str(idNum),)
+        cur.execute(sql, params)
+        conn.commit()
+    except:
+        return "error"
+
+    try:
+        cur = conn.cursor()
         sql = "DELETE FROM student WHERE id = %s"
         params = (str(idNum),)
         cur.execute(sql, params)
         conn.commit()
     except:
         return "error"
+    
     return "success"
 
 def try_deleteEnrollment(conn, idNum, course):
