@@ -1,17 +1,24 @@
-import uuid
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.db import models
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import CheckConstraint, Q
 
 # Create your models here.
+
+import uuid
+
+from django.db import models
+
+# Create your models here.
+
 class Guidance_Counselor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100, null=False)
     last_name = models.CharField(max_length=100, null=False)
     start_date = models.DateField(auto_now=False, auto_now_add=False)
-    
+
 class Student(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
@@ -24,7 +31,7 @@ class Student(models.Model):
     math_SAT = models.IntegerField(validators=[MinValueValidator(200), MaxValueValidator(800)])
     eng_SAT = models.IntegerField(validators=[MinValueValidator(200), MaxValueValidator(800)])
     guidance_ID = models.ForeignKey(Guidance_Counselor, null=False, on_delete=models.CASCADE)
-    
+
 class Extracurriculars(models.Model):
     ExtracurricularType = [
         ('sport', 'Sport'),
@@ -35,13 +42,8 @@ class Extracurriculars(models.Model):
         ('other', 'Other')
     ]
  
-    name = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    extracurricular_type = models.CharField(choices=ExtracurricularType)
-
-class Participates_In(models.Model):
-    extracurricular_name = models.ForeignKey(Extracurriculars, null=False, on_delete=models.CASCADE)
-    student_id = models.ForeignKey(Student, null=False, on_delete=models.CASCADE)
-    hours =  models.IntegerField(validators=[MinValueValidator(1)])
+    name = models.CharField(primary_key=True, max_length=100, null=False)
+    extracurricular_type = models.CharField(default= 'Sport',choices=ExtracurricularType)
 
 class College(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -58,7 +60,7 @@ class College(models.Model):
         ('private_university', 'Private University')
     ]
     
-    c_type = models.CharField(choices=CollegeType, max_length=100)
+    c_type = models.CharField(default= 'Community College', choices=CollegeType, max_length=100)
     num_of_students = models.IntegerField(validators=[MinValueValidator(1)])
     room_and_board = models.FloatField()
     email_of_contact = models.EmailField(unique=True)
@@ -70,8 +72,8 @@ class College(models.Model):
         
     test_optional = models.CharField(choices=Answer, max_length=20)
     cost_after_aid = models.FloatField()
-    GPA_avg = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(4.0)])
-    ACT_avg = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(36)])
+    gpa_avg = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(4.0)])
+    act_avg = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(36)])
     math_SAT_avg = models.IntegerField(validators=[MinValueValidator(200), MaxValueValidator(800)])
     eng_SAT_avg = models.IntegerField(validators=[MinValueValidator(200), MaxValueValidator(800)])
 
@@ -83,11 +85,11 @@ class College(models.Model):
                 name='grad_rate_check'
             ),
             CheckConstraint(
-                check=Q(GPA_avg__gte=0.0) & Q(GPA_avg__lte=4.0),
+                check=Q(gpa_avg__gte=0.0) & Q(gpa_avg__lte=4.0),
                 name='college_GPA_avg_range'
             ),
             CheckConstraint(
-                check=Q(ACT_avg__gte=1) & Q(ACT_avg_lte=36),
+                check=Q(act_avg__gte=1) & Q(act_avg__lte=36),
                 name='college_ACT_avg_range'
             ),
             CheckConstraint(
@@ -100,7 +102,12 @@ class College(models.Model):
                 
             )
         ]
-        
+
+class Participates_In(models.Model):
+    extracurricular_name = models.ForeignKey(Extracurriculars, null=False, on_delete=models.CASCADE)
+    student_id = models.ForeignKey(Student, null=False, on_delete=models.CASCADE)
+    hours =  models.IntegerField(validators=[MinValueValidator(1)])
+
 class Application(models.Model):
     student_id = models.ForeignKey(Student, null=False, on_delete=models.CASCADE)
     college_id = models.ForeignKey(College, null=False, on_delete=models.CASCADE)
@@ -135,7 +142,7 @@ class Application(models.Model):
         
     visited = models.CharField(choices=Answer, max_length=20)
     interview = models.CharField(choices=Answer, max_length=20)
-    
+
 class SupplementaryQuestion(models.Model):  # Class names should be CamelCase without underscores
     question_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     college = models.ForeignKey(College, on_delete=models.CASCADE)  # Use the model name directly
@@ -145,15 +152,8 @@ class SupplementaryQuestion(models.Model):  # Class names should be CamelCase wi
         unique_together = ('college', 'question')  # This ensures uniqueness of the combination
         verbose_name_plural = "Supplementary Questions"
         
-class SupplementaryQuestionAnswer(models.Model):  # CamelCase naming convention
+class SupplementaryQuestionAnswer(models.Model):
     answer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     question = models.ForeignKey(SupplementaryQuestion, on_delete=models.CASCADE, related_name='answers')
     answer = models.TextField()
-
-    def clean(self):
-        # Ensure the question is linked to the specified college
-        if not SupplementaryQuestion.objects.filter(pk=self.question.question_id, college=self.question.college).exists():
-            raise ValidationError({'question': 'This question does not exist for the specified college.'})
-
-    def __str__(self):
-        return self.answer
+    
