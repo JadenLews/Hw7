@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Students Page</title>
+    <link rel="stylesheet" href="{% static 'university/styles.css' %}">
+</head>
+<body>
+    <a href="{% url 'admin:index' %}">Back to Admin</a>
+    <h1>Students List</h1>
+    <ul>
+        {% for student in students %}
+            <li>{{ student.first_name }} - {{ student.high_school }},  {{ student.GPA }}</li>
+        {% empty %}
+            <li>No students found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
