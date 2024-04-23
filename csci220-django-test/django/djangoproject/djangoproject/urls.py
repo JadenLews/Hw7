@@ -23,4 +23,6 @@ urlpatterns = [
     path('minifacebook/', include('minifacebook.urls')),
     path('admin/', admin.site.urls),
     path('new-page/', new_page, name='new_page'),
+    path('college-page/', college_page, name="college_page"),
+    path('home-page/', home_page, name='home_page'),
 ]
