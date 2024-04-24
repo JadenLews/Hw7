@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guidance Counselor Page</title>
+    <link rel="stylesheet" href="{% static 'university/styles.css' %}">
+</head>
+<body>
+    <a href="/home">Back to Home</a>
+    <h1>Guidance Counselor List</h1>
+    <p>Guidance Councelor: <strong>F_NAME L_NAME, EMAIL, START DATE: (ID)</strong></p>
+        <p>Student: <strong>F_NAME L_NAME, EMAIL, HIGH SCHOOL, GPA: (ID)</strong></p>
+    <ul>
+        {% for guide in guidance %}
+            <li>{{ guide.first_name }} {{ guide.last_name }}, {{ guide.email }}, {{ guide.start_date }}, ({{ guide.id }}) </li>
+            <h3 class="super">Supervises</h3>
+            <ul class="list_students">
+                {% for student in guide.student_set.all %}
+                    <li>{{ student.first_name }} {{ student.last_name }}, {{ student.email }}, {{ student.high_school }}, {{ student.GPA }}, ({{ student.id }})</li>
+                {% empty %}
+                    <li>Supervises Zero Students</li>
+                {% endfor %}
+            </ul>
+        {% empty %}
+            <li>Zero Guidance Councelors</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

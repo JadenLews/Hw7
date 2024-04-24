@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Students Application Results</title>
+    <link rel="stylesheet" href="{% static 'university/styles.css' %}">
+</head>
+<body>
+    <a href="/home">Back to Home</a>
+    <h1>Student Application Results</h1>
+    <ul>
+        {% for student in students %}
+            <li>
+                <strong>Name: {{ student.first_name }} {{student.last_name}}</strong><br>
+                High School: {{ student.high_school }} <br>
+                GPA: {{ student.GPA }} <br>
+                SAT Total: {{ student.math_SAT|add:student.eng_SAT }}<br>
+                Extracurricular Activities: 
+                {% for participation in student.participates_in_set.all %}
+                    {{ participation.extracurricular_name.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    None
+                {% endfor %}
+                <br>
+                College Applications:
+                <ul>
+                    {% for application in student.application_set.all %}
+                        <li>
+                            <strong>College Name: {{ application.college_id.name }} </strong><br>
+                            Average GPA: {{ application.college_id.gpa_avg }} <br>
+                            Average SAT: {{ application.college_id.math_SAT_avg|add:application.college_id.eng_SAT_avg}} <br>
+                            Applied: {{ application.date_applied }} <br>
+                            <span class="{% if application.app_status == 'admitted' %}status-admitted{% elif application.app_status == 'denied' %}status-denied{% endif %}">
+                                Status: {{ application.app_status }}
+                            </span>
+                        </li>
+                    {% empty %}
+                        <li>No applications found.</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% empty %}
+            <li>No students found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

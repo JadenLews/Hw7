@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guidance Counselor Page</title>
+    <link rel="stylesheet" href="{% static 'university/styles.css' %}">
+</head>
+<body>
+    <h1>Undergraduate Application Tracker</h1>
+    <a href="{% url 'admin:index' %}">
+        <h4>Admin Interface</h4>
+    </a>
+    <a href="/guidance_page">
+        <h4>Guidance Councelor</h4>
+    </a>
+    <a href="/application_results">
+        <h4>Student Applications</h4>
+    </a>
+    <a href="/question_page">
+        <h4>Questions</h4>
+    </a>
+    <a href="/college-page">
+        <h4>Colleges</h4>
+    </a>
+    <a href="/instructions">
+        <h4>Model Parameters</h4>
+    </a>
+</body>
+</html>

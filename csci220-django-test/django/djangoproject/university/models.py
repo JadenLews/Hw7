@@ -156,4 +156,3 @@ class SupplementaryQuestionAnswer(models.Model):
     answer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     question = models.ForeignKey(SupplementaryQuestion, on_delete=models.CASCADE, related_name='answers')
     answer = models.TextField()
-    

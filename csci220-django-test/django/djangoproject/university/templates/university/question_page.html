@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Question Page</title>
+    <link rel="stylesheet" href="{% static 'university/styles.css' %}">
+</head>
+<body>
+    <a href="/home">Back to Home</a>
+    <h1>Questions List</h1>
+    <p>Question: <strong>College: (ID)</strong></p>
+    <p><strong>Question</strong></p>
+    <ul>
+        {% for quest in question %}
+            <li>{{quest.college.name}}: ({{quest.question_id}})</li>
+            <li>{{ quest.question}}</li>
+            <h3 class="super">Answer</h3>
+            <ul class="list_students">
+                {% for ans in quest.answers.all %}
+                    <li>{{ans.answer}}</li>
+                {% empty %}
+                    <li>Question is waiting to be answered</li>
+                {% endfor %}
+            </ul>
+        {% empty %}
+            <li>Zero Questions</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

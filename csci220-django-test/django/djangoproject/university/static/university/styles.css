@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 20px;
+}
+
+h1 {
+    color: #000000;
+}
+
+ul {
+    background: #fff;
+    padding: 20px;
+    list-style: none;
+}
+
+li {
+    margin: 5px 0;
+    padding: 10px;
+    background: #e9ecef;
+}
+
+.list_students li{
+    position: relative;
+    left: 1vw;
+}
+
+.super {
+    color: rgb(52, 52, 52);
+    font-size: 24px;
+}
+h3{
+    position: relative;
+    left: 2vw;
+}
+
+.status-admitted {
+    background-color: #c8e6c9; 
+}
+
+.status-denied {
+    background-color: #ffcdd2; 
+}

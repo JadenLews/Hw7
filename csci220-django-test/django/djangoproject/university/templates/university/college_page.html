@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>College Page</title>
+    <link rel="stylesheet" href="{% static 'university/styles.css' %}">
+</head>
+<body>
+    <a href="/home">Back to Home</a>
+    <h1>College List</h1>
+    <ul>
+        {% load custom_filters %}
+        {% for college in colleges %}
+            <li><strong>{{ college.name }} in {{ college.location }}</strong></li>  
+            <li>College Type: {{ college.c_type|reformat }} <br>
+                Number of Students: {{ college.num_of_students }} <br>
+                Graduation Rate: {{ college.grad_rate }}%
+            </li>
+            <li>Tuition: ${{ college.tuition }} <br> 
+                Room and Board: ${{ college.room_and_board }} <br>
+                Average Cost After Aid: ${{ college.cost_after_aid }}
+            </li>
+            <li>Test Optional: {{ college.test_optional|reformat }} <br>
+                Average GPA: {{ college.gpa_avg }} <br>
+                Average ACT: {{ college.act_avg }} <br>
+                Average Math SAT: {{ college.math_SAT_avg }} <br>
+                Average English SAT: {{ college.eng_SAT_avg }} </li>
+            <br>
+                <div class="app_stats">
+                    <strong>Application Statistics:</strong>
+                    <ul>
+                        <li>Total Applications: {{ college.total_count }}<br>
+                        Total Accepted: {{ college.admitted_count }}</li>
+                        <li>Overall Acceptance Rate: 
+                            {% if college.total_count > 0 %}
+                                {{ college.acceptance_rate|floatformat:"2" }}%
+                            {% else %}
+                                No application records found.
+                            {% endif %}
+                        </li>
+                    </ul>
+        {% empty %}
+            <li>No colleges found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

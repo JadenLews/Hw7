@@ -16,9 +16,27 @@ Including another URLconf
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path
+from university.views import new_page
+from university.views import guidance_page
+from university.views import home
+from university.views import instructions
+from university.views import question_page
+from university.views import application_results
+from university.views import college_page
+from university.views import home_page
+
 
 urlpatterns = [
-    path('', lambda req: redirect('admin/')),
+    path('', lambda req: redirect('new-page/')),
     path('minifacebook/', include('minifacebook.urls')),
     path('admin/', admin.site.urls),
+    path('guidance_page/', guidance_page, name='guidance_page'),
+    path('home/', home, name='home'),
+    path('instructions/', instructions, name='instructions'),
+    path('question_page/', question_page, name='question_page'),
+    path('application_results/', application_results, name='application_results'),
+    path('college-page/', college_page, name="college_page"),
+    path('home-page/', home_page, name='home_page'),
 ]
+
+
