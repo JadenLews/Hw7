@@ -4,11 +4,27 @@ from .models import Guidance_Counselor
 from .models import SupplementaryQuestion
 from .models import Application
 from .models import College
+
+from itertools import groupby
+from operator import attrgetter
 # Create your views here.
 
 def application_results(request):
     students = Student.objects.all().prefetch_related('application_set')
     return render(request, 'university/application_results.html', {'students': students})
+
+def extracurriculars(request):
+    students = Student.objects.all()
+
+    for student in students:
+        student.extracurriculars = {}
+        participations = student.participates_in_set.all().order_by('extracurricular_name__extracurricular_type')
+
+        for extracurricular_type, group in groupby(participations, key=attrgetter('extracurricular_name.extracurricular_type')):
+            student.extracurriculars[extracurricular_type] = list(group)
+
+    return render(request, 'university/extracurriculars.html', {'students': students})
+
 
 def new_page(request):
     students = Student.objects.all()
