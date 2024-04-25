@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Extracurricular Activities</title>
+    <link rel="stylesheet" href="{% static 'university/styles.css' %}">
+</head>
+<body>
+    <a href="/home">Back to Home</a>
+    <h1>Student Extracurricular Activities</h1>
+    <ul>
+        {% for student in students %}
+            <li>
+                <strong>Name: {{ student.first_name }} {{ student.last_name }}</strong><br>
+                {% if student.extracurriculars %}
+                    {% load custom_filters %}
+                    {% for extracurricular_type, activities in student.extracurriculars.items %}
+                        <div>
+                            <p><strong>{{ extracurricular_type|reformat }}</strong></p>
+                            <ul>
+                                {% for participation in activities %}
+                                    <li>
+                                        <p>{{ participation.extracurricular_name.name }}</p>
+                                        <p>{{ participation.hours }} hours per week</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No extracurricular activities found.</p>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No students found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
